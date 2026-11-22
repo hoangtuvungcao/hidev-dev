@@ -1,0 +1,144 @@
+# hi_dev. - Developer Community & Knowledge Hub
+
+## Overview
+hi_dev. is a community platform for sharing, reviewing, and discovering software development articles, technology products, helper libraries, and code helper posts. The application is built using Next.js (App Router), Vanilla CSS, and a MySQL/MariaDB database. All operations are dynamically served.
+
+## Primary Keywords
+- Developer tools
+- Programming articles
+- Software development
+- Open-source libraries
+- Code utilities
+- Developer resources
+- Tech community
+- JavaScript, TypeScript, Python, Go, Rust programming
+- Web development
+- API documentation
+- Frontend development
+- Backend development
+- DevOps tools
+- Database libraries
+
+## Target Audience
+- Software developers
+- Programmers
+- Tech enthusiasts
+- Open-source contributors
+- Student developers
+- Full-stack engineers
+- DevOps engineers
+
+## Routing System (URLs)
+
+- [`/`](/) - Main dashboard. Displays lists of approved developer posts sorted by upvote counts. Support search query parameter `?search=keyword` and filters.
+- [`/categories/[slug]`](/categories/[slug]) - Filtered view of developer posts belonging to a specific category.
+- [`/posts/[slug]`](/posts/[slug]) - Detail view of a post. Renders markdown documentation, links, upvote metrics, and a dynamic comment section.
+- [`/submit`](/submit) - Allows authenticated members to submit a new post (pending admin approval).
+- [`/login`](/login) - Integrated login and registration forms.
+- [`/users/[username]`](/users/[username]) - Public user profiles showing their published posts and voted posts.
+- [`/profile`](/profile) - Profile settings for authenticated users (change password, update profile details).
+- [`/admin`](/admin) - Admin overview statistics (total posts, pending, comments, members).
+- [`/admin/posts`](/admin/posts) - Moderation queue for admin users to approve or reject posts.
+- [`/admin/settings`](/admin/settings) - Dynamic branding control panel (modify website name, domain, email, logo, phone, footer, and default SEO values).
+- [`/rss.xml`](/rss.xml) - Dynamic RSS 2.0 feed of the 50 most recent approved posts.
+- [`/sitemap.xml`](/sitemap.xml) - Dynamic sitemap mapping allowed public URLs.
+- [`/robots.txt`](/robots.txt) - Search engine crawler configuration.
+- [`/manifest.json`](/manifest.json) - Web App Manifest / PWA specification.
+
+## Core Architecture & Security
+
+- **Next.js Middleware (`src/proxy.ts`)**: Automatically protects private routes (`/admin/*`, `/submit/*`, `/profile/*`) and redirects unauthenticated requests. Includes zero-dependency rate limiting (60 req/min limit) for API routes.
+- **JWT Session Security**: Session tokens are cryptographically signed with HMAC SHA-256 using a timing-safe evaluation (`timingSafeEqual`) to prevent timing attacks. Tokens are stored in HttpOnly cookies, marked as secure in production, with a 7-day expiration time.
+- **OAuth Integration**: Integrates Google and GitHub login via state tokens (against CSRF) and PKCE flow (`code_challenge` / `code_verifier`) for Google authentication. Employs a simulated sandbox on local development environments if client IDs are missing.
+- **Markdown & XSS Protection**: Detailed post content is rendered securely using `marked` (GFM standard) sanitized by isomorphic `DOMPurify` (with `jsdom` window simulator on the server-side).
+
+## API Specifications
+
+All endpoints communicate using JSON.
+
+### Authentication
+- `POST /api/auth/login` - Authenticate user credentials and set HttpOnly JWT cookie.
+  - Body: `{ username, password }`
+- `POST /api/auth/register` - Create a new user account with Dicebear random avatar.
+  - Body: `{ username, email, password }`
+- `POST /api/auth/logout` - Clear session token cookie and clear state parameters.
+
+### Posts (Developer Articles)
+- `GET /api/posts` - Retrieve list of approved posts.
+  - Query parameters: `search` (text filter), `category` (category slug filter).
+- `POST /api/posts` - Submit a new post. Requires authentication.
+  - Body: `{ title, summary, link, content, categoryId, thumbnail }`
+- `POST /api/posts/[id]/vote` - Toggle upvote state for the authenticated user.
+
+### Comments
+- `GET /api/posts/[id]/comments` - Fetch comments list for a specific post.
+- `POST /api/posts/[id]/comments` - Publish a new comment. Requires authentication.
+  - Body: `{ content, parentId }` (supports nested replies).
+
+### Notifications
+- `GET /api/notifications` - Fetch user's notification list.
+- `GET /api/notifications/stream` - SSE (Server-Sent Events) live notification stream.
+- `POST /api/notifications/mark-read` - Mark specific notification as read.
+- `POST /api/notifications/mark-all-read` - Mark all notifications as read.
+
+### Categories
+- `GET /api/categories` - Fetch all categories.
+
+### Admin Operations (Moderators Only)
+- `GET /api/admin/posts` - Fetch all submitted posts across all statuses (approved, pending, rejected).
+- `PATCH /api/admin/posts` - Update the moderation status of a post.
+  - Body: `{ id, status }` (status is 'approved', 'pending', or 'rejected').
+- `GET /api/admin/settings` - Retrieve all website settings.
+- `POST /api/admin/settings` - Update batch website settings.
+  - Body: Key-value map of configuration settings.
+
+## SEO & AI Crawlability
+
+### Metadata & Structured Data
+- **JSON-LD Schema**: Implements Organization, WebSite, and searchAction structured data for better indexing
+- **Open Graph**: Rich preview cards with og:title, og:description, og:image, og:url for social sharing
+- **Twitter Card**: Optimized for Twitter/X sharing with summary_large_image format
+- **Robots.txt**: Allows all major search engines (Google, Bing, DuckDuck) and AI crawlers (GPT-4, Claude, Bingbot)
+- **Sitemap.xml**: Dynamically generated with all public URLs, categories, posts, and user profiles
+- **RSS Feed**: /rss.xml with 50 latest posts for feed readers and discovery engines
+- **Language Alternates**: hreflang tags for Vietnamese and English versions
+
+### Crawlable Pages
+All public pages are fully crawlable for SEO:
+- Homepage: [`/`](/) (priority 1.0, daily)
+- Post detail pages: [`/posts/[slug]`](/posts/[slug]) (priority 0.9, monthly)
+- Category pages: [`/categories/[slug]`](/categories/[slug]) (priority 0.8, weekly)
+- User profiles: [`/users/[username]`](/users/[username]) (priority 0.7, monthly)
+- Search page: [`/search`](/search) (priority 0.7, daily)
+- RSS feed: [`/rss.xml`](/rss.xml) (priority 0.8, daily)
+
+### Private/Blocked Routes
+The following routes are protected from crawling:
+- [`/admin/*`](/admin) - Admin dashboard (requires authentication)
+- [`/submit/*`](/submit) - Post submission (requires authentication)
+- [`/profile/*`](/profile) - User settings (requires authentication)
+- [`/login*`](/login) - Login/register pages (private access)
+- API auth routes: `/api/auth/*`
+- API admin routes: `/api/admin/*`
+
+### SEO Best Practices Implemented
+1. **Mobile Responsive**: Full responsiveness for mobile, tablet, and desktop devices
+2. **Fast Page Load**: Optimized images, lazy loading, caching headers (1 hour client, 30 min server)
+3. **Structured Navigation**: Clear hierarchy and categorization
+4. **Rich Descriptions**: Meta descriptions, summaries, and keywords for each page type
+5. **Semantic HTML**: Proper heading hierarchy (h1, h2, h3), semantic tags
+6. **Internal Linking**: Category links, related posts, user profiles, search functionality
+7. **Image Optimization**: Thumbnail images with alt text for accessibility and SEO
+8. **Canonical URLs**: Self-referential canonical tags to avoid duplicate content
+9. **Bilingual Support**: Separate language paths with hreflang alternates
+10. **Dynamic Content**: Real-time updates for post counts, upvotes, comments
+
+### AI Training Data Optimization
+This documentation file (llm.txt) is optimized for:
+- LLM fine-tuning and knowledge extraction
+- Semantic search understanding
+- Content classification and tagging
+- Natural language processing
+- Information retrieval systems
+
+All API endpoints return JSON with structured data for easy parsing by AI systems.

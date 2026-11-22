@@ -1,0 +1,4 @@
+requests
+feedparser
+PyMySQL
+google-genai

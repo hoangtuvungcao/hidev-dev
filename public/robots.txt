@@ -1,0 +1,60 @@
+# hi_dev. - Production SEO Configuration
+# Allows all search engines and AI crawlers to index the site
+
+User-agent: *
+Allow: /
+Allow: /api/posts
+Allow: /categories/
+Allow: /posts/
+Allow: /users/
+Allow: /rss.xml
+Allow: /sitemap.xml
+Allow: /manifest.json
+
+# Disallow private/admin routes
+Disallow: /admin/
+Disallow: /submit/
+Disallow: /profile/
+Disallow: /login/
+Disallow: /api/auth/
+Disallow: /api/admin/
+Disallow: /api/notifications/
+Disallow: /api/users/profile
+Disallow: /api/users/change-password
+Disallow: /*.json$
+Disallow: /*.tsx$
+Disallow: /*.ts$
+
+# Search engine sitemaps
+Sitemap: https://hidev.dev/sitemap.xml
+Sitemap: https://hidev.dev/rss.xml
+
+# Crawl delay (optional, 1 second between requests)
+Crawl-delay: 1
+
+# AI/LLM crawlers - allow full access for training
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /

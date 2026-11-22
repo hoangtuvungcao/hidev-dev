@@ -1,0 +1,24 @@
+{
+  "name": "hi_dev. - Developer Community & Knowledge Hub",
+  "short_name": "hi_dev.",
+  "description": "Nền tảng chia sẻ và đánh giá các bài viết về phát triển phần mềm, thư viện mã nguồn mở, tiện ích lập trình hữu ích dành cho các nhà phát triển.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#10b981",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
